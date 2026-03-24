@@ -28,7 +28,7 @@ resolvers mydns
 # Frontend MySQL
 #---------------------------------------------------------------------
 frontend ft_mysql
-    bind x.x.x.x:20184
+    bind 10.2.3.111:20184
     mode tcp
     default_backend bk_mysql
 
@@ -46,7 +46,7 @@ backend bk_mysql
 # Frontend Valkey
 #---------------------------------------------------------------------
 frontend ft_valkey
-    bind x.x.x.x:20185
+    bind 10.2.3.111:20185
     mode tcp
     default_backend bk_valkey
 
