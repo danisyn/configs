@@ -1,0 +1,61 @@
+global
+    log /dev/log local0
+    log /dev/log local1 notice
+    maxconn 4096
+    daemon
+
+defaults
+    log     global
+    mode    tcp
+    option  tcplog
+    option  dontlognull
+    timeout connect 5s
+    timeout client  30s
+    timeout server  30s
+
+#---------------------------------------------------------------------
+# Resolvers DNS
+#---------------------------------------------------------------------
+resolvers mydns
+    nameserver dns1 8.8.8.8:53
+    nameserver dns2 1.1.1.1:53
+    resolve_retries 3
+    timeout resolve 1s
+    timeout retry   1s
+    hold valid      10s
+
+#---------------------------------------------------------------------
+# Frontend MySQL
+#---------------------------------------------------------------------
+frontend ft_mysql
+    bind x.x.x.x:20184
+    mode tcp
+    default_backend bk_mysql
+
+#---------------------------------------------------------------------
+# Backend MySQL
+#---------------------------------------------------------------------
+backend bk_mysql
+    mode tcp
+    balance roundrobin
+    option tcp-check
+    default-server inter 3s fall 3 rise 2 resolvers mydns resolve-prefer ipv4
+    server mysql1 mysql-fc55de7b-o6f27ca4b.database.cloud.ovh.net:20184 check resolvers mydns resolve-prefer ipv4
+
+#---------------------------------------------------------------------
+# Frontend Valkey
+#---------------------------------------------------------------------
+frontend ft_valkey
+    bind x.x.x.x:20185
+    mode tcp
+    default_backend bk_valkey
+
+#---------------------------------------------------------------------
+# Backend Valkey
+#---------------------------------------------------------------------
+backend bk_valkey
+    mode tcp
+    balance roundrobin
+    option tcp-check
+    default-server inter 3s fall 3 rise 2 resolvers mydns resolve-prefer ipv4
+    server valkey1 valkey-ab2a188f-o6f27ca4b.database.cloud.ovh.net:20185 check resolvers mydns resolve-prefer ipv4
